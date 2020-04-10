@@ -1,4 +1,4 @@
-# Desafio 02 - Iniciando backend do Fastfeet
+# Desafio 03 - FastFeet, continuando a aplicação (Passo 69)
 
 1. Start package.json with Yarn
    `yarn init -y`
@@ -218,3 +218,59 @@
 68. Create a new repository in Github and sync with local repository
     `git remote add origin https://github.com/leandrochavesf/nodejs-iniciando-backend-fastfeet-desafio02.git`
     `git push -u origin master`
+
+69. Create a new migration of deliverymans
+    `yarn sequelize migration:create --name=create-deliverymans`
+
+70. Run migration via CLI to migrate fields to database
+    `yarn sequelize db:migrate`
+
+71. So, I need configure Files support to permite attribute avatar_id
+    in deliveryman.
+
+72. Create a FileController.js and adjust routes.js to call this Controller
+
+73. With migrations, create a new table in BD to Files
+    `yarn sequelize migration:create --name=create-files`
+
+74. Configure migration `create-files` and run migration through the CLI
+    `yarn sequelize db:migrate`
+
+75. Create a model `File.js` to Files
+
+76. Import File model in index.js on `/app/database/index.js`
+
+77. Code FileController to insert data of File in BD
+
+78. With migrations, create a column to relate User with File in BD `deliverymans`
+    `yarn sequelize migration:create --name=add-avatar-field-to-deliverymans`
+
+79. Run again migrate through the CLI
+    `yarn sequelize db:migrate`
+
+80. Create a model `Deliveryman.js` to Deliveryman
+
+81. Create a associate `belongsTo` in Model Deliveryman
+
+82. Configure in `/app/database/index.js` a map to `associate` created
+
+83. Create controller `DeliverymanController.js` and CRUD methods
+
+84. Configure `routes.js` to permite access DeliverymanController
+
+85. Create a new migration of delivery
+    `yarn sequelize migration:create --name=create-deliverys`
+
+86. Run migration via CLI to migrate fields to database
+    `yarn sequelize db:migrate`
+
+87. Create a model `Delivery.js` to Deliveries
+
+88. Create a associate `belongsTo` of FKs in Model `Delivery.js`
+
+89. Configure in `/app/database/index.js` a map to `associate` created
+
+90. Create controller `DeliveryController.js` and begin to code CRUD
+
+91. Install library to work with dates in `DeliveryController.update`
+    `yarn add date-fns`
