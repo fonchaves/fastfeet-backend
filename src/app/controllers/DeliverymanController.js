@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
 import Deliveryman from '../models/Deliveryman';
+import File from '../models/File';
 
 class DeliverymanController {
   async index(req, res) {
@@ -14,10 +15,21 @@ class DeliverymanController {
       email: Yup.string()
         .email()
         .required(),
+      avatar_id: Yup.number(),
     });
 
     if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ error: 'Validation fails' });
+    }
+
+    if (!req.body.avatar_id) {
+      const rand = Math.floor(Math.random() * 1000);
+
+      const file = await File.create({
+        name: 'Avatar Adorable',
+        path: `https://api.adorable.io/avatars/100/avatar${rand}.png`,
+      });
+      req.body.avatar_id = file.id;
     }
 
     const userExists = await Deliveryman.findOne({
@@ -48,7 +60,7 @@ class DeliverymanController {
       return res.status(400).json({ error: 'Validation fails' });
     }
 
-    const { index } = req.params;
+    const { id: index } = req.params;
 
     const deliveryman = await Deliveryman.findByPk(index);
 

@@ -15,24 +15,28 @@ routes.get('/', (req, res) => {
   return res.send('Hello World!');
 });
 
+/** CRIAÇAO E AUTENTICAÇAO DE USUARIOS */
 routes.post('/users', UserController.store);
 routes.post('/session', SessionController.store);
 
-// AUTENTICAÇAO OBRIGATORIA DESTA LINHA PRA BAIXO
+// AUTENTICAÇAO DE ADMINISTRADORES OBRIGATORIA DESTA LINHA PRA BAIXO
 routes.use(authMiddleware);
 
 routes.put('/users', UserController.update);
 
+routes.post('/files', FileController.store);
+
+/** CRIACAO E ATUALIZACAO DE DESTINATARIOS */
 routes.post('/recipient', RecipientController.store);
 routes.put('/recipient/:index', RecipientController.update);
 
-routes.post('/files', FileController.store);
-
+/** CRUD DE ENTREGADORES */
 routes.get('/deliveryman', DeliverymanController.index);
 routes.post('/deliveryman', DeliverymanController.store);
 routes.put('/deliveryman/:index', DeliverymanController.update); // TODO: Trocar para id
 routes.delete('/deliveryman/:index', DeliverymanController.delete); // TODO: Trocar para id
 
+/** CRUD DE ENCOMENDAS */
 routes.get('/delivery', DeliveryController.index);
 routes.post('/delivery', DeliveryController.store);
 routes.put('/delivery/:id', DeliveryController.update);

@@ -1,4 +1,11 @@
-# Desafio 03 - FastFeet, continuando a aplicação (Passo 69)
+# Roteiro de passos
+
+- [Desafio 02 - O início](#desafio-02---O-início)
+- [Desafio 03 - Continuando a aplicação](#desafio-03---continuando-a-aplicação)
+
+# Passos
+
+### Desafio 02 - O início
 
 1. Start package.json with Yarn
    `yarn init -y`
@@ -8,7 +15,7 @@
 
 3. Create `src` forlder, and inside make files route.js, app.js and server.js
 
-4. Make a constructor of `Class App` in app.js, and yout functions
+4. Make a constructor of `Class App` in app.js, and your functions
    `Middlewares` and `Routes`
 
 5. Install Sucrase (Babel alternative) to enable use `import` instead of `const`
@@ -32,7 +39,7 @@
 
 13. Install Postbird, connect on container and create a database with name `gobarber`
 
-14. Install eslint to standadize the code
+14. Install eslint to standardize the code
     `yarn add eslint -D`
 
 15. Run eslint
@@ -75,7 +82,7 @@
 20. Install prettier and auxiliar dependences
     `yarn add prettier eslint-config-prettier eslint-plugin-prettier -D`
 
-21) Add prettier to extends, plugins and rules in `.eslintrc`
+21. Add prettier to extends, plugins and rules in `.eslintrc`
 
 ```js
   extends: ['airbnb-base', 'prettier'],
@@ -85,7 +92,7 @@
   }
 ```
 
-22. Create .prettierrc file to overwirte some rules of eslint.
+22. Create `.prettierrc` file to overwirte some rules of eslint.
 
 ```js
   {
@@ -118,7 +125,7 @@
 28. Install sequelize-cli to facilitate model creation
     `yarn add sequelize-cli -D`
 
-29. Create file .sequelizerc to configure paths of sequelize on app
+29. Create file `.sequelizerc` to configure paths of sequelize on app
 
 30. To use postgres with sequelize, instal pg dependences
     `yarn add pg pg-hstore`
@@ -150,7 +157,7 @@
 41. Code a test to identify double entry on database in moment of add User
 
 42. We don't need return all parameters, so we wipe some parameters to return in
-    UserController.store()
+    `UserController.store()`
 
 43. Install bcrypt to create hashs of passwords
     `yarn add bcryptjs`
@@ -216,8 +223,10 @@
     `git commit -m "Initial commit"`
 
 68. Create a new repository in Github and sync with local repository
-    `git remote add origin https://github.com/leandrochavesf/nodejs-iniciando-backend-fastfeet-desafio02.git`
+    `git remote add origin https://github.com/leandrochavesf/fastfeet-backend.git`
     `git push -u origin master`
+
+### Desafio 03 - Continuando a aplicação
 
 69. Create a new migration of deliverymans
     `yarn sequelize migration:create --name=create-deliverymans`
