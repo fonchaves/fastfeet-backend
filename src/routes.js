@@ -33,8 +33,9 @@ routes.put('/recipient/:index', RecipientController.update);
 /** CRUD DE ENTREGADORES */
 routes.get('/deliveryman', DeliverymanController.index);
 routes.post('/deliveryman', DeliverymanController.store);
-routes.put('/deliveryman/:index', DeliverymanController.update); // TODO: Trocar para id
-routes.delete('/deliveryman/:index', DeliverymanController.delete); // TODO: Trocar para id
+routes.get('/deliveryman/:id', DeliverymanController.show);
+routes.put('/deliveryman/:id', DeliverymanController.update);
+routes.delete('/deliveryman/:id', DeliverymanController.delete);
 
 /** CRUD DE ENCOMENDAS */
 routes.get('/delivery', DeliveryController.index);

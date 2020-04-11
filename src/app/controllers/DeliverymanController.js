@@ -22,6 +22,7 @@ class DeliverymanController {
       return res.status(400).json({ error: 'Validation fails' });
     }
 
+    // TODO: Avaliar estratégia de inserção junto ao Frontend
     if (!req.body.avatar_id) {
       const rand = Math.floor(Math.random() * 1000);
 
@@ -44,7 +45,26 @@ class DeliverymanController {
     return res.json(deliveryman);
   }
 
-  // TODO: Desenvolver, se necessário, o método Show()
+  async show(req, res) {
+    const { id: index } = req.params;
+
+    const { id, name, email, avatar } = await Deliveryman.findByPk(index, {
+      include: [
+        {
+          model: File,
+          as: 'avatar',
+          attributes: ['id', 'name', 'path', 'url'],
+        },
+      ],
+    });
+
+    return res.status(200).json({
+      id,
+      name,
+      email,
+      avatar,
+    });
+  }
 
   async update(req, res) {
     const schema = Yup.object().shape({
@@ -61,22 +81,22 @@ class DeliverymanController {
     }
 
     const { id: index } = req.params;
+    const { name, email } = req.body;
 
     const deliveryman = await Deliveryman.findByPk(index);
 
-    // TODO: Posteriromente desestruturar
-    if (req.body.email && req.body.email !== deliveryman.email) {
+    if (email && email !== deliveryman.email) {
       const emailExists = await Deliveryman.findOne({
-        where: { email: req.body.email },
+        where: { email },
       });
       if (emailExists) {
         return res.status(400).json({ error: 'E-mail already exists.' });
       }
     }
 
-    const { id, name, email } = await deliveryman.update(req.body);
+    const { id } = await deliveryman.update(req.body);
 
-    return res.json({
+    return res.status(200).json({
       id,
       name,
       email,
@@ -84,7 +104,7 @@ class DeliverymanController {
   }
 
   async delete(req, res) {
-    const { index } = req.params;
+    const { id: index } = req.params;
 
     const deliveryman = await Deliveryman.findByPk(index);
 
@@ -94,7 +114,7 @@ class DeliverymanController {
 
     await deliveryman.destroy();
 
-    return res.status(200);
+    return res.status(200).json();
   }
 }
 
