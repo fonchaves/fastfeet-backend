@@ -5,6 +5,16 @@ import File from '../models/File';
 
 class DeliveryController {
   async index(req, res) {
+    /** CHECK TYPES OF BODY */
+    const schema = Yup.object().shape({
+      page: Yup.number(),
+    });
+
+    // TODO: RETORNAR ERROS DE VALIDAÇAO MAIS ESPECIFICOS
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ error: 'Validation fails' });
+    }
+
     const { page = 1 } = req.body;
 
     const deliveryData = await Delivery.findAll({
@@ -24,7 +34,7 @@ class DeliveryController {
       include: [
         {
           model: File,
-          as: 'signature_id',
+          as: 'signature',
           attributes: ['id', 'path', 'url'],
         },
       ],
@@ -34,15 +44,14 @@ class DeliveryController {
   }
 
   async store(req, res) {
-    /**
-     * Check Types of body
-     */
+    /** CHECK TYPES OF BODY */
+    // TODO: AVALIAR OS CAMPOS NOTREQUIRED SE SERAO NECESSARIOS AQUI
     const schema = Yup.object().shape({
       recipient_id: Yup.number().required(),
       deliveryman_id: Yup.number().required(),
       product: Yup.string().required(),
-      signature_id: Yup.number(),
-      canceled_at: Yup.date(),
+      signature_id: Yup.number().notRequired(),
+      canceled_at: Yup.date().notRequired(),
       start_date: Yup.date().notRequired(),
       end_date: Yup.date().notRequired(),
     });
@@ -52,21 +61,24 @@ class DeliveryController {
       return res.status(400).json({ error: 'Validation fails' });
     }
 
-    /**
-     * Save Delivery on BD
-     */
-    const deliveryData = await Delivery.create(req.body);
+    /** DESTRUCTURING */
+    const { recipient_id, deliveryman_id, product } = req.body;
+
+    /** SAVE DELIVERY IN BD */
+    const deliveryData = await Delivery.create({
+      recipient_id,
+      deliveryman_id,
+      product,
+    });
 
     // TODO: NOTIFICAR O DELIVERYMAN COM EMAIL E DETALHES DA ENCOMENDA
 
-    // TODO: Limpar para voltar apenas com dados necessários
+    // TODO: RETORNAR APENAS DADOS NECESSARIOS
     return res.status(201).json(deliveryData);
   }
 
   async update(req, res) {
-    /**
-     * Check Types of body
-     */
+    /** CHECK TYPES OF BODY */
     const schema = Yup.object().shape({
       recipient_id: Yup.number(),
       deliveryman_id: Yup.number(),
@@ -82,7 +94,16 @@ class DeliveryController {
       return res.status(400).json({ error: 'Validation fails' });
     }
 
-    const { start_date, end_date } = req.body;
+    /** DESTRUCTURING */
+    const {
+      recipient_id,
+      deliveryman_id,
+      product,
+      signature_id,
+      start_date,
+      end_date,
+      canceled_at,
+    } = req.body;
     const { id } = req.params;
 
     const delivery = await Delivery.findByPk(id);
@@ -125,13 +146,31 @@ class DeliveryController {
     }
 
     /**
+     * Check if its not possible to cancel delivery
+     */
+    if (canceled_at && delivery.end_date) {
+      return res.status(400).json({
+        error:
+          "It's not permitted cancel delivery because it has already been completed ",
+      });
+    }
+
+    /**
      * Update Delivery on BD
      */
-    const deliveryData = await delivery.update(req.body);
+    const deliveryData = await delivery.update({
+      recipient_id,
+      deliveryman_id,
+      product,
+      signature_id,
+      start_date,
+      end_date,
+      canceled_at,
+    });
 
     // TODO: NOTIFICAR O DELIVERYMAN COM EMAIL E DETALHES DA ENCOMENDA
 
-    // TODO: Limpar para voltar apenas com dados necessários
+    // TODO: RETORNAR APENAS DADOS NECESSARIOS
     return res.status(200).json(deliveryData);
   }
 
@@ -146,7 +185,7 @@ class DeliveryController {
 
     await deliveryData.destroy();
 
-    return res.status(200);
+    return res.status(200).json();
   }
 }
 
