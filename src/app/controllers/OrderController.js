@@ -1,4 +1,5 @@
 import { isBefore, getHours, startOfDay, endOfDay } from 'date-fns';
+import * as Yup from 'yup';
 import Delivery from '../models/Delivery';
 
 const { Op } = require('sequelize');
@@ -87,17 +88,36 @@ class OrderController {
   }
 
   async update(req, res) {
-    const { id, id_delivery } = req.params;
+    const schema = Yup.object().shape({
+      signature_id: Yup.number().required(),
+    });
 
-    const deliveries = await Delivery.findAll({
+    if (!(await schema.isValid(req.body))) {
+      return res
+        .status(400)
+        .json({ error: 'Validation fails, signature_id is required' });
+    }
+
+    const { id: deliverymanId, id_delivery: deliveryId } = req.params;
+    const { signature_id: signatureId } = req.body;
+
+    const currentDate = new Date();
+
+    const delivery = await Delivery.findOne({
       where: {
-        deliveryman_id: id,
+        id: deliveryId,
+        deliveryman_id: deliverymanId,
         canceled_at: null,
-        end_date: { [Op.not]: null },
+        end_date: null,
       },
     });
 
-    return res.status(200).json(deliveries);
+    const dataDelivery = await delivery.update({
+      end_date: currentDate,
+      signature_id: signatureId,
+    });
+
+    return res.status(200).json(dataDelivery);
   }
 }
 
