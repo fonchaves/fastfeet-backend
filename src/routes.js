@@ -3,6 +3,7 @@ import { Router } from 'express';
 import DeliveryController from './app/controllers/DeliveryController';
 import DeliverymanController from './app/controllers/DeliverymanController';
 import FileController from './app/controllers/FileController';
+import OrderController from './app/controllers/OrderController';
 import RecipientController from './app/controllers/RecipientController';
 import SessionController from './app/controllers/SessionController';
 import UserController from './app/controllers/UserController';
@@ -42,5 +43,9 @@ routes.get('/delivery', DeliveryController.index);
 routes.post('/delivery', DeliveryController.store);
 routes.put('/delivery/:id', DeliveryController.update);
 routes.delete('/delivery/:id', DeliveryController.delete);
+
+/** CRUD DE ORDENS DE ENTREGA */
+routes.get('/deliveryman/:id/orders', OrderController.index);
+routes.get('/deliveryman/:id/deliveries', OrderController.show);
 
 export default routes;

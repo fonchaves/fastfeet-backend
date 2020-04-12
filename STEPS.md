@@ -283,3 +283,11 @@
 
 91. Install library to work with dates in `DeliveryController.update`
     `yarn add date-fns`
+
+92. Create a new route to get orders by deliveryman
+
+93. Create `src/app/controllers/OrderController.js`
+
+94. Create `OrderController.index` method to show all orders of an deliveryman
+
+95. Create `OrderController.show` method to show only orders delivered of an deliveryman
