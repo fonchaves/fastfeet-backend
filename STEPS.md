@@ -1,3 +1,9 @@
+# Necessidades que apareceram
+
+- [] Colocar as validações num arquivo separado
+- [] Adicionar paginação
+- [] Adicionar paginação
+
 # Roteiro de passos
 
 - [Desafio 02 - O início](#desafio-02---O-início)
@@ -291,3 +297,5 @@
 94. Create `OrderController.index` method to show all orders of an deliveryman
 
 95. Create `OrderController.show` method to show only orders delivered of an deliveryman
+
+96. Create `OrderController.store` method to permit deliveryman to start a delivery

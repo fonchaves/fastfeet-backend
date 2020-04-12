@@ -31,21 +31,23 @@ routes.post('/files', FileController.store);
 routes.post('/recipient', RecipientController.store);
 routes.put('/recipient/:index', RecipientController.update);
 
-/** CRUD DE ENTREGADORES */
+/** ROTAS DE ENTREGADORES */
 routes.get('/deliveryman', DeliverymanController.index);
 routes.post('/deliveryman', DeliverymanController.store);
 routes.get('/deliveryman/:id', DeliverymanController.show);
 routes.put('/deliveryman/:id', DeliverymanController.update);
 routes.delete('/deliveryman/:id', DeliverymanController.delete);
 
-/** CRUD DE ENCOMENDAS */
+/** ROTAS DE ENCOMENDAS */
 routes.get('/delivery', DeliveryController.index);
 routes.post('/delivery', DeliveryController.store);
 routes.put('/delivery/:id', DeliveryController.update);
 routes.delete('/delivery/:id', DeliveryController.delete);
 
-/** CRUD DE ORDENS DE ENTREGA */
+/** ROTAS DE ORDENS DE ENTREGA */
 routes.get('/deliveryman/:id/orders', OrderController.index);
 routes.get('/deliveryman/:id/deliveries', OrderController.show);
+routes.post('/deliveryman/:id/orders/:id_delivery', OrderController.store);
+routes.put('/deliveryman/:id/orders/:id_delivery', OrderController.update);
 
 export default routes;
