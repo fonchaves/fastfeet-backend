@@ -2,11 +2,43 @@ import * as Yup from 'yup';
 import Deliveryman from '../models/Deliveryman';
 import File from '../models/File';
 
+const { Op } = require('sequelize');
+
 class DeliverymanController {
   async index(req, res) {
-    // TODO: Avaliar necessidade de retornar o avatar_id
-    const deliverymans = await Deliveryman.findAll();
-    return res.json(deliverymans);
+    /** CHECK TYPES OF BODY */
+    const schema = Yup.object().shape({
+      page: Yup.number(),
+    });
+
+    // TODO: RETORNAR ERROS DE VALIDAÇAO MAIS ESPECIFICOS
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ error: 'Validation fails' });
+    }
+
+    /** DESTRUCTURING */
+    const { page = 1 } = req.body; // TODO: Analisar se passa para Query Params
+    const { q: name } = req.query;
+
+    // TODO: Nomes com acentos não retornam
+    const deliverymansData = await Deliveryman.findAll({
+      where: {
+        name: { [Op.iLike]: name ? `%${name}%` : `%%` },
+      },
+      order: [['name', 'ASC']],
+      attributes: ['id', 'name', 'email'],
+      limit: 20,
+      offset: (page - 1) * 20,
+      include: [
+        {
+          model: File,
+          as: 'avatar',
+          attributes: ['id', 'path', 'url'],
+        },
+      ],
+    });
+
+    return res.json(deliverymansData);
   }
 
   async store(req, res) {

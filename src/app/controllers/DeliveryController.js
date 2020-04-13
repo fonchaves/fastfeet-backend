@@ -1,7 +1,10 @@
 import * as Yup from 'yup';
 import { startOfHour, parseISO, isAfter, isBefore, getHours } from 'date-fns';
+
 import Delivery from '../models/Delivery';
 import File from '../models/File';
+
+const { Op } = require('sequelize');
 
 class DeliveryController {
   async index(req, res) {
@@ -15,11 +18,16 @@ class DeliveryController {
       return res.status(400).json({ error: 'Validation fails' });
     }
 
-    const { page = 1 } = req.body;
+    /** DESTRUCTURING */
+    const { page = 1 } = req.body; // TODO: Analisar se passa para Query Params
+    const { q: nameProduct } = req.query;
 
     const deliveryData = await Delivery.findAll({
-      where: { canceled_at: null },
-      order: [['start_date', 'DESC']],
+      where: {
+        canceled_at: null,
+        product: { [Op.iLike]: nameProduct ? `%${nameProduct}%` : `%%` },
+      },
+      order: [['created_at', 'DESC']],
       attributes: [
         'id',
         'recipient_id',

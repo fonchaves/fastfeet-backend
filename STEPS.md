@@ -325,3 +325,14 @@
 106.  Create method `DeliveryProblem.show` to return a especific problem of delivery
 
 107.  Create method `DeliveryProblem.delete` to delete a especific problem of delivery
+
+108.  In `DeliveryController.js`, in index method add functions to search deliveries with
+      a query name.
+
+109.  In `DeliverymanController.js`, in index method add functions to search deliverymans with
+      a query name.
+
+110.  In `RecipientController.js`, in index method add functions to search recipients with
+      a query name.
+
+111.  Add a new route to `RecipientController.index` in `routes.js`

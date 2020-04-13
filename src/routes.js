@@ -28,7 +28,8 @@ routes.put('/users', UserController.update);
 
 routes.post('/files', FileController.store);
 
-/** CRIACAO E ATUALIZACAO DE DESTINATARIOS */
+/** ROTAS DE DESTINATARIOS */
+routes.get('/recipient', RecipientController.index);
 routes.post('/recipient', RecipientController.store);
 routes.put('/recipient/:index', RecipientController.update);
 

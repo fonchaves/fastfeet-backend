@@ -1,7 +1,47 @@
 import * as Yup from 'yup';
 import Recipient from '../models/Recipient';
 
+const { Op } = require('sequelize');
+
 class RecipientController {
+  async index(req, res) {
+    /** CHECK TYPES OF BODY */
+    const schema = Yup.object().shape({
+      page: Yup.number(),
+    });
+
+    // TODO: RETORNAR ERROS DE VALIDAÇAO MAIS ESPECIFICOS
+    if (!(await schema.isValid(req.body))) {
+      return res.status(400).json({ error: 'Validation fails' });
+    }
+
+    /** DESTRUCTURING */
+    const { page = 1 } = req.body; // TODO: Analisar se passa para Query Params
+    const { q: name } = req.query;
+
+    // TODO: Nomes com acentos não retornam
+    const recipientsData = await Recipient.findAll({
+      where: {
+        name: { [Op.iLike]: name ? `%${name}%` : `%%` },
+      },
+      order: [['name', 'ASC']],
+      attributes: [
+        'id',
+        'name',
+        'street',
+        'number',
+        'complement',
+        'state',
+        'city',
+        'zip_code',
+      ],
+      limit: 20,
+      offset: (page - 1) * 20,
+    });
+
+    return res.json(recipientsData);
+  }
+
   async store(req, res) {
     const schema = Yup.object().shape({
       name: Yup.string().required(),
