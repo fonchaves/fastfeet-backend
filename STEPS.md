@@ -1,4 +1,17 @@
-# Desafio 02 - Iniciando backend do Fastfeet
+# Necessidades que apareceram
+
+- [] Colocar as validações num arquivo separado
+- [] Adicionar paginação
+- [] Adicionar paginação
+
+# Roteiro de passos
+
+- [Desafio 02 - O início](#desafio-02---O-início)
+- [Desafio 03 - Continuando a aplicação](#desafio-03---continuando-a-aplicação)
+
+# Passos
+
+### Desafio 02 - O início
 
 1. Start package.json with Yarn
    `yarn init -y`
@@ -8,7 +21,7 @@
 
 3. Create `src` forlder, and inside make files route.js, app.js and server.js
 
-4. Make a constructor of `Class App` in app.js, and yout functions
+4. Make a constructor of `Class App` in app.js, and your functions
    `Middlewares` and `Routes`
 
 5. Install Sucrase (Babel alternative) to enable use `import` instead of `const`
@@ -32,7 +45,7 @@
 
 13. Install Postbird, connect on container and create a database with name `gobarber`
 
-14. Install eslint to standadize the code
+14. Install eslint to standardize the code
     `yarn add eslint -D`
 
 15. Run eslint
@@ -75,7 +88,7 @@
 20. Install prettier and auxiliar dependences
     `yarn add prettier eslint-config-prettier eslint-plugin-prettier -D`
 
-21) Add prettier to extends, plugins and rules in `.eslintrc`
+21. Add prettier to extends, plugins and rules in `.eslintrc`
 
 ```js
   extends: ['airbnb-base', 'prettier'],
@@ -85,7 +98,7 @@
   }
 ```
 
-22. Create .prettierrc file to overwirte some rules of eslint.
+22. Create `.prettierrc` file to overwirte some rules of eslint.
 
 ```js
   {
@@ -118,7 +131,7 @@
 28. Install sequelize-cli to facilitate model creation
     `yarn add sequelize-cli -D`
 
-29. Create file .sequelizerc to configure paths of sequelize on app
+29. Create file `.sequelizerc` to configure paths of sequelize on app
 
 30. To use postgres with sequelize, instal pg dependences
     `yarn add pg pg-hstore`
@@ -150,7 +163,7 @@
 41. Code a test to identify double entry on database in moment of add User
 
 42. We don't need return all parameters, so we wipe some parameters to return in
-    UserController.store()
+    `UserController.store()`
 
 43. Install bcrypt to create hashs of passwords
     `yarn add bcryptjs`
@@ -216,5 +229,99 @@
     `git commit -m "Initial commit"`
 
 68. Create a new repository in Github and sync with local repository
-    `git remote add origin https://github.com/leandrochavesf/nodejs-iniciando-backend-fastfeet-desafio02.git`
+    `git remote add origin https://github.com/leandrochavesf/fastfeet-backend.git`
     `git push -u origin master`
+
+### Desafio 03 - Continuando a aplicação
+
+69. Create a new migration of deliverymans
+    `yarn sequelize migration:create --name=create-deliverymans`
+
+70. Run migration via CLI to migrate fields to database
+    `yarn sequelize db:migrate`
+
+71. So, I need configure Files support to permite attribute avatar_id
+    in deliveryman.
+
+72. Create a FileController.js and adjust routes.js to call this Controller
+
+73. With migrations, create a new table in BD to Files
+    `yarn sequelize migration:create --name=create-files`
+
+74. Configure migration `create-files` and run migration through the CLI
+    `yarn sequelize db:migrate`
+
+75. Create a model `File.js` to Files
+
+76. Import File model in index.js on `/app/database/index.js`
+
+77. Code FileController to insert data of File in BD
+
+78. With migrations, create a column to relate User with File in BD `deliverymans`
+    `yarn sequelize migration:create --name=add-avatar-field-to-deliverymans`
+
+79. Run again migrate through the CLI
+    `yarn sequelize db:migrate`
+
+80. Create a model `Deliveryman.js` to Deliveryman
+
+81. Create a associate `belongsTo` in Model Deliveryman
+
+82. Configure in `/app/database/index.js` a map to `associate` created
+
+83. Create controller `DeliverymanController.js` and CRUD methods
+
+84. Configure `routes.js` to permite access DeliverymanController
+
+85. Create a new migration of delivery
+    `yarn sequelize migration:create --name=create-deliverys`
+
+86. Run migration via CLI to migrate fields to database
+    `yarn sequelize db:migrate`
+
+87. Create a model `Delivery.js` to Deliveries
+
+88. Create a associate `belongsTo` of FKs in Model `Delivery.js`
+
+89. Configure in `/app/database/index.js` a map to `associate` created
+
+90. Create controller `DeliveryController.js` and begin to code CRUD
+
+91. Install library to work with dates in `DeliveryController.update`
+    `yarn add date-fns`
+
+92. Create a new route to get orders by deliveryman
+
+93. Create `src/app/controllers/OrderController.js`
+
+94. Create `OrderController.index` method to show all orders of an deliveryman
+
+95. Create `OrderController.show` method to show only orders delivered of an deliveryman
+
+96. Create `OrderController.store` method to permit deliveryman to start a delivery
+
+97. Create `OrderController.update` method to permit deliveryman to end a delivery
+
+98. Create a new migration of delivery_problems
+    `yarn sequelize migration:create --name=create-delivery_problems`
+
+99. Run migration via CLI to migrate fields to database
+    `yarn sequelize db:migrate`
+
+100.  Create group of routes to register a `delivery_problem` in `routes.js`
+
+101.  Create file `app/controllers/DeliveryProblemController.js` to make control of
+      delivery problems.
+
+102.  Create a model of DeliveryProblem in `app/models/DeliveryProblem.js` and import
+      in `DeliveryProblemController`
+
+103.  Add model `DeliveryProblem` to initiate in list of models `src/database/index.js`
+
+104.  Create method `DeliveryProblem.store` to register a problem of delivery
+
+105.  Create method `DeliveryProblem.index` to return all problems registered
+
+106.  Create method `DeliveryProblem.show` to return a especific problem of delivery
+
+107.  Create method `DeliveryProblem.delete` to delete a especific problem of delivery
