@@ -299,3 +299,29 @@
 95. Create `OrderController.show` method to show only orders delivered of an deliveryman
 
 96. Create `OrderController.store` method to permit deliveryman to start a delivery
+
+97. Create `OrderController.update` method to permit deliveryman to end a delivery
+
+98. Create a new migration of delivery_problems
+    `yarn sequelize migration:create --name=create-delivery_problems`
+
+99. Run migration via CLI to migrate fields to database
+    `yarn sequelize db:migrate`
+
+100.  Create group of routes to register a `delivery_problem` in `routes.js`
+
+101.  Create file `app/controllers/DeliveryProblemController.js` to make control of
+      delivery problems.
+
+102.  Create a model of DeliveryProblem in `app/models/DeliveryProblem.js` and import
+      in `DeliveryProblemController`
+
+103.  Add model `DeliveryProblem` to initiate in list of models `src/database/index.js`
+
+104.  Create method `DeliveryProblem.store` to register a problem of delivery
+
+105.  Create method `DeliveryProblem.index` to return all problems registered
+
+106.  Create method `DeliveryProblem.show` to return a especific problem of delivery
+
+107.  Create method `DeliveryProblem.delete` to delete a especific problem of delivery

@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import DeliveryController from './app/controllers/DeliveryController';
 import DeliverymanController from './app/controllers/DeliverymanController';
+import DeliveryProblemController from './app/controllers/DeliveryProblemController';
 import FileController from './app/controllers/FileController';
 import OrderController from './app/controllers/OrderController';
 import RecipientController from './app/controllers/RecipientController';
@@ -49,5 +50,11 @@ routes.get('/deliveryman/:id/orders', OrderController.index);
 routes.get('/deliveryman/:id/deliveries', OrderController.show);
 routes.post('/deliveryman/:id/orders/:id_delivery', OrderController.store);
 routes.put('/deliveryman/:id/orders/:id_delivery', OrderController.update);
+
+/** ROTAS DE PROBLEMAS DE ENTREGA */
+routes.get('/delivery/problems', DeliveryProblemController.index);
+routes.get('/delivery/:id/problems', DeliveryProblemController.show);
+routes.post('/delivery/:id/problems', DeliveryProblemController.store);
+routes.delete('/problem/:id/cancel-delivery', DeliveryProblemController.delete);
 
 export default routes;
