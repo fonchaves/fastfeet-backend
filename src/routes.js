@@ -9,7 +9,8 @@ import RecipientController from './app/controllers/RecipientController';
 import SessionController from './app/controllers/SessionController';
 import UserController from './app/controllers/UserController';
 
-import authMiddleware from './app/middlewares/auth';
+/** Middleware of Authorization */
+import isPrivate from './app/middlewares/auth';
 
 const routes = new Router();
 
@@ -18,33 +19,30 @@ routes.get('/', (req, res) => {
 });
 
 /** CRIAÇAO E AUTENTICAÇAO DE USUARIOS */
-routes.post('/users', UserController.store);
-routes.post('/session', SessionController.store);
+routes.post('/sessions', SessionController.store);
+routes.post('/users', isPrivate, UserController.store);
+routes.put('/users', isPrivate, UserController.update);
 
-// AUTENTICAÇAO DE ADMINISTRADORES OBRIGATORIA DESTA LINHA PRA BAIXO
-routes.use(authMiddleware);
-
-routes.put('/users', UserController.update);
-
+/** ROTA DE ENVIO DE ARQUIVOS EM GERAL */
 routes.post('/files', FileController.store);
 
 /** ROTAS DE DESTINATARIOS */
-routes.get('/recipient', RecipientController.index);
-routes.post('/recipient', RecipientController.store);
-routes.put('/recipient/:index', RecipientController.update);
+routes.get('/recipient', isPrivate, RecipientController.index);
+routes.post('/recipient', isPrivate, RecipientController.store);
+routes.put('/recipient/:index', isPrivate, RecipientController.update);
 
 /** ROTAS DE ENTREGADORES */
-routes.get('/deliveryman', DeliverymanController.index);
-routes.post('/deliveryman', DeliverymanController.store);
 routes.get('/deliveryman/:id', DeliverymanController.show);
-routes.put('/deliveryman/:id', DeliverymanController.update);
-routes.delete('/deliveryman/:id', DeliverymanController.delete);
+routes.get('/deliveryman', isPrivate, DeliverymanController.index);
+routes.post('/deliveryman', isPrivate, DeliverymanController.store);
+routes.put('/deliveryman/:id', isPrivate, DeliverymanController.update);
+routes.delete('/deliveryman/:id', isPrivate, DeliverymanController.delete);
 
 /** ROTAS DE ENCOMENDAS */
-routes.get('/delivery', DeliveryController.index);
-routes.post('/delivery', DeliveryController.store);
-routes.put('/delivery/:id', DeliveryController.update);
-routes.delete('/delivery/:id', DeliveryController.delete);
+routes.get('/delivery', isPrivate, DeliveryController.index);
+routes.post('/delivery', isPrivate, DeliveryController.store);
+routes.put('/delivery/:id', isPrivate, DeliveryController.update);
+routes.delete('/delivery/:id', isPrivate, DeliveryController.delete);
 
 /** ROTAS DE ORDENS DE ENTREGA */
 routes.get('/deliveryman/:id/orders', OrderController.index);
@@ -53,9 +51,13 @@ routes.post('/deliveryman/:id/orders/:id_delivery', OrderController.store);
 routes.put('/deliveryman/:id/orders/:id_delivery', OrderController.update);
 
 /** ROTAS DE PROBLEMAS DE ENTREGA */
-routes.get('/delivery/problems', DeliveryProblemController.index);
+routes.get('/delivery/problems', isPrivate, DeliveryProblemController.index);
 routes.get('/delivery/:id/problems', DeliveryProblemController.show);
 routes.post('/delivery/:id/problems', DeliveryProblemController.store);
-routes.delete('/problem/:id/cancel-delivery', DeliveryProblemController.delete);
+routes.delete(
+  '/problem/:id/cancel-delivery',
+  isPrivate,
+  DeliveryProblemController.delete
+);
 
 export default routes;

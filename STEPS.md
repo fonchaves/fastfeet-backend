@@ -1,8 +1,10 @@
 # Necessidades que apareceram
 
 - [] Colocar as validações num arquivo separado
-- [] Adicionar paginação
-- [] Adicionar paginação
+- [x] Adicionar paginação
+- [] Afinar os valores de paginação conforme frontend
+- [] Modificar Routes pasa usar authenticação mais organizada
+- [] Na rota de Orders, incluir o retorno dos dados de endereço de entrega
 
 # Roteiro de passos
 
@@ -336,3 +338,5 @@
       a query name.
 
 111.  Add a new route to `RecipientController.index` in `routes.js`
+
+112.  Define and refine routes as Protect or not in `Routes.js`
