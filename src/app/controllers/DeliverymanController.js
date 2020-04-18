@@ -1,82 +1,10 @@
-import * as Yup from 'yup';
 import Deliveryman from '../models/Deliveryman';
 import File from '../models/File';
+import detectAccent from '../../lib/AccentRegex';
 
 const { Op } = require('sequelize');
 
 class DeliverymanController {
-  async index(req, res) {
-    /** CHECK TYPES OF BODY */
-    const schema = Yup.object().shape({
-      page: Yup.number(),
-    });
-
-    // TODO: RETORNAR ERROS DE VALIDAÇAO MAIS ESPECIFICOS
-    if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation fails' });
-    }
-
-    /** DESTRUCTURING */
-    const { page = 1 } = req.body; // TODO: Analisar se passa para Query Params
-    const { q: name } = req.query;
-
-    // TODO: Nomes com acentos não retornam
-    const deliverymansData = await Deliveryman.findAll({
-      where: {
-        name: { [Op.iLike]: name ? `%${name}%` : `%%` },
-      },
-      order: [['name', 'ASC']],
-      attributes: ['id', 'name', 'email'],
-      limit: 20,
-      offset: (page - 1) * 20,
-      include: [
-        {
-          model: File,
-          as: 'avatar',
-          attributes: ['id', 'path', 'url'],
-        },
-      ],
-    });
-
-    return res.json(deliverymansData);
-  }
-
-  async store(req, res) {
-    const schema = Yup.object().shape({
-      name: Yup.string().required(),
-      email: Yup.string()
-        .email()
-        .required(),
-      avatar_id: Yup.number(),
-    });
-
-    if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation fails' });
-    }
-
-    // TODO: Avaliar estratégia de inserção junto ao Frontend
-    if (!req.body.avatar_id) {
-      const rand = Math.floor(Math.random() * 1000);
-
-      const file = await File.create({
-        name: 'Avatar Adorable',
-        path: `https://api.adorable.io/avatars/100/avatar${rand}.png`,
-      });
-      req.body.avatar_id = file.id;
-    }
-
-    const userExists = await Deliveryman.findOne({
-      where: { email: req.body.email },
-    });
-
-    if (userExists) {
-      return res.status(400).json({ error: 'Deliveryman already exists.' });
-    }
-
-    const deliveryman = await Deliveryman.create(req.body);
-    return res.json(deliveryman);
-  }
-
   async show(req, res) {
     const { id: index } = req.params;
 
@@ -98,20 +26,62 @@ class DeliverymanController {
     });
   }
 
-  async update(req, res) {
-    const schema = Yup.object().shape({
-      name: Yup.string(),
-      avatar_id: Yup.number(),
-      email: Yup.string().email(),
-      confirmEmail: Yup.string().when('email', (email, field) =>
-        email ? field.required().oneOf([Yup.ref('email')]) : field
-      ),
+  async index(req, res) {
+    /** DESTRUCTURING */
+    const { q: name, page = 1 } = req.query;
+
+    const deliverymansData = await Deliveryman.findAll({
+      where: {
+        name: {
+          [Op.or]: {
+            [Op.iLike]: name ? `%${name}%` : `%%`,
+            [Op.iRegexp]: name ? `${detectAccent(name)}` : `%%`,
+          },
+        },
+      },
+      order: [['name', 'ASC']],
+      attributes: ['id', 'name', 'email'],
+      limit: 20,
+      offset: (page - 1) * 20,
+      include: [
+        {
+          model: File,
+          as: 'avatar',
+          attributes: ['id', 'path', 'url'],
+        },
+      ],
     });
 
-    if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation fails' });
+    return res.json(deliverymansData);
+  }
+
+  async store(req, res) {
+    // TODO: Avaliar estratégia de inserção junto ao Frontend
+    if (!req.body.avatar_id) {
+      const rand = Math.floor(Math.random() * 1000);
+
+      const file = await File.create({
+        name: 'Avatar Adorable',
+        path: `https://api.adorable.io/avatars/100/avatar${rand}.png`,
+      });
+      req.body.avatar_id = file.id;
     }
 
+    const userExists = await Deliveryman.findOne({
+      where: { email: req.body.email },
+    });
+
+    if (userExists) {
+      return res.status(400).json({ error: 'Deliveryman already exists.' });
+    }
+
+    const { id, name, email, avatar_id } = await Deliveryman.create(req.body);
+
+    return res.status(201).json({ id, name, email, avatar_id });
+  }
+
+  async update(req, res) {
+    /** DESTRUCTURING */
     const { id: index } = req.params;
     const { name, email } = req.body;
 
@@ -136,6 +106,7 @@ class DeliverymanController {
   }
 
   async delete(req, res) {
+    /** DESTRUCTURING */
     const { id: index } = req.params;
 
     const deliveryman = await Deliveryman.findByPk(index);

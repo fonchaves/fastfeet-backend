@@ -16,6 +16,9 @@ import validateSessionStore from './app/validators/SessionStore';
 import validateRecipientIndex from './app/validators/RecipientIndex';
 import validateRecipientStore from './app/validators/RecipientStore';
 import validateRecipientUpdate from './app/validators/RecipientUpdate';
+import validateDeliverymanIndex from './app/validators/DeliverymanIndex';
+import validateDeliverymanStore from './app/validators/DeliverymanStore';
+import validateDeliverymanUpdate from './app/validators/DeliverymanUpdate';
 
 /** Middleware of Authorization */
 import isPrivate from './app/middlewares/auth';
@@ -56,9 +59,24 @@ routes.put(
 
 /** ROTAS DE ENTREGADORES */
 routes.get('/deliveryman/:id', DeliverymanController.show);
-routes.get('/deliveryman', isPrivate, DeliverymanController.index);
-routes.post('/deliveryman', isPrivate, DeliverymanController.store);
-routes.put('/deliveryman/:id', isPrivate, DeliverymanController.update);
+routes.get(
+  '/deliveryman',
+  isPrivate,
+  validateDeliverymanIndex,
+  DeliverymanController.index
+);
+routes.post(
+  '/deliveryman',
+  isPrivate,
+  validateDeliverymanStore,
+  DeliverymanController.store
+);
+routes.put(
+  '/deliveryman/:id',
+  isPrivate,
+  validateDeliverymanUpdate,
+  DeliverymanController.update
+);
 routes.delete('/deliveryman/:id', isPrivate, DeliverymanController.delete);
 
 /** ROTAS DE ENCOMENDAS */

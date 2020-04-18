@@ -354,7 +354,7 @@
 
 118.  Make the same thing to `validators/RecipientIndex.js` with `RecipientController.index`
 
-119.  In `RecipientController.index`, e resolve problem of query string with accents.
+119.  In `RecipientController.index`, we resolve problem of query string with accents.
       We create a file `src/lib/AccentRegex.js` to receive a string and return a regex with
       accents about that string
 
@@ -364,3 +364,12 @@
 121.  Make the same thing to `validators/RecipientStore.js` with `RecipientController.store`
 
 122.  Make the same thing to `validators/RecipientUpdate.js` with `RecipientController.update`
+
+123.  Import `src/lib/AccentRegex.js` in `DeliverymanController.index` and configure operators
+      to make a respective query on DB.
+
+124.  Make the same thing to `validators/DeliverymanControllerStore.js` with
+      `DeliverymanControllerController.store`
+
+125.  Make the same thing to `validators/DeliverymanControllerUpdate.js` with
+      `DeliverymanControllerController.update`
