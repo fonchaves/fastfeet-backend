@@ -340,3 +340,27 @@
 111.  Add a new route to `RecipientController.index` in `routes.js`
 
 112.  Define and refine routes as Protect or not in `Routes.js`
+
+113.  Refactor code to separate validators in another folder
+
+114.  Create folder `/src/app/validators`
+
+115.  Create `validators/UserStore.js`, and cut code validator of `UserController.store`
+      and put in this nem file.
+
+116.  Make the same thing to `validators/UserUpdate.js` with `UserController.update`
+
+117.  Import validators in `Routes.js` and put as a middleware in your respective route
+
+118.  Make the same thing to `validators/RecipientIndex.js` with `RecipientController.index`
+
+119.  In `RecipientController.index`, e resolve problem of query string with accents.
+      We create a file `src/lib/AccentRegex.js` to receive a string and return a regex with
+      accents about that string
+
+120.  Import `src/lib/AccentRegex.js` in `RecipientController.index` and configure operators
+      to make a respective query on DB.
+
+121.  Make the same thing to `validators/RecipientStore.js` with `RecipientController.store`
+
+122.  Make the same thing to `validators/RecipientUpdate.js` with `RecipientController.update`

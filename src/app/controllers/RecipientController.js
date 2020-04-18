@@ -1,28 +1,21 @@
-import * as Yup from 'yup';
 import Recipient from '../models/Recipient';
+import detectAccent from '../../lib/AccentRegex';
 
 const { Op } = require('sequelize');
 
 class RecipientController {
   async index(req, res) {
-    /** CHECK TYPES OF BODY */
-    const schema = Yup.object().shape({
-      page: Yup.number(),
-    });
-
-    // TODO: RETORNAR ERROS DE VALIDAÇAO MAIS ESPECIFICOS
-    if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation fails' });
-    }
-
     /** DESTRUCTURING */
-    const { page = 1 } = req.body; // TODO: Analisar se passa para Query Params
-    const { q: name } = req.query;
+    const { q: name, page = 1 } = req.query;
 
-    // TODO: Nomes com acentos não retornam
     const recipientsData = await Recipient.findAll({
       where: {
-        name: { [Op.iLike]: name ? `%${name}%` : `%%` },
+        name: {
+          [Op.or]: {
+            [Op.iLike]: name ? `%${name}%` : `%%`,
+            [Op.iRegexp]: name ? `${detectAccent(name)}` : `%%`,
+          },
+        },
       },
       order: [['name', 'ASC']],
       attributes: [
@@ -43,24 +36,18 @@ class RecipientController {
   }
 
   async store(req, res) {
-    const schema = Yup.object().shape({
-      name: Yup.string().required(),
-      street: Yup.string().required(),
-      number: Yup.number().required(),
-      complement: Yup.string(),
-      state: Yup.string().required(),
-      city: Yup.string().required(),
-      zip_code: Yup.string().required(),
+    const recipientExists = await Recipient.findOne({
+      where: {
+        [Op.and]: {
+          number: req.body.number,
+          zip_code: req.body.zip_code,
+        },
+      },
     });
 
-    if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation fails' });
+    if (recipientExists) {
+      return res.status(400).json({ error: 'Recipient already exists ' });
     }
-
-    // TODO: Identificar duplicatas a partir da uniao de number + zipcode
-    /* const recipientExists = await Recipient.findOne({
-      where: { email: req.body.email },
-    }); */
 
     const {
       id,
@@ -86,41 +73,23 @@ class RecipientController {
   }
 
   async update(req, res) {
-    const schema = Yup.object().shape({
-      name: Yup.string(),
-      street: Yup.string().when('zip_code', (street, field) =>
-        street ? field.required() : field
-      ),
-      number: Yup.number().when('zip_code', (number, field) =>
-        number ? field.required() : field
-      ),
-      complement: Yup.string(),
-      state: Yup.string().when('zip_code', (state, field) =>
-        state ? field.required() : field
-      ),
-      city: Yup.string().when('zip_code', (city, field) =>
-        city ? field.required() : field
-      ),
-      zip_code: Yup.string(),
+    const recipientExists = await Recipient.findOne({
+      where: {
+        [Op.and]: {
+          number: req.body.number,
+          zip_code: req.body.zip_code,
+        },
+      },
     });
 
-    if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation fails' });
+    if (recipientExists) {
+      return res.status(400).json({ error: 'Recipient already exists ' });
     }
 
+    /** DESTRUCTURING */
     const { index } = req.params;
 
     const recipient = await Recipient.findByPk(index);
-
-    // TODO: Identificar duplicatas a partir da uniao de number + zipcode
-    /* const { email, oldPassword } = req.body;
-    if (email && email !== user.email) {
-      const userExists = await User.findOne({ where: { email } });
-
-      if (userExists) {
-        return res.status(400).json({ error: 'User already exists ' });
-      }
-    } */
 
     const {
       id,

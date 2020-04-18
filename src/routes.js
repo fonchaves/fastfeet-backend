@@ -9,6 +9,14 @@ import RecipientController from './app/controllers/RecipientController';
 import SessionController from './app/controllers/SessionController';
 import UserController from './app/controllers/UserController';
 
+/** Middleware of Entry Validators */
+import validateUserStore from './app/validators/UserStore';
+import validateUserUpdate from './app/validators/UserUpdate';
+import validateSessionStore from './app/validators/SessionStore';
+import validateRecipientIndex from './app/validators/RecipientIndex';
+import validateRecipientStore from './app/validators/RecipientStore';
+import validateRecipientUpdate from './app/validators/RecipientUpdate';
+
 /** Middleware of Authorization */
 import isPrivate from './app/middlewares/auth';
 
@@ -19,17 +27,32 @@ routes.get('/', (req, res) => {
 });
 
 /** CRIAÇAO E AUTENTICAÇAO DE USUARIOS */
-routes.post('/sessions', SessionController.store);
-routes.post('/users', isPrivate, UserController.store);
-routes.put('/users', isPrivate, UserController.update);
+routes.post('/sessions', validateSessionStore, SessionController.store);
+routes.post('/users', isPrivate, validateUserStore, UserController.store);
+routes.put('/users', isPrivate, validateUserUpdate, UserController.update);
 
 /** ROTA DE ENVIO DE ARQUIVOS EM GERAL */
 routes.post('/files', FileController.store);
 
 /** ROTAS DE DESTINATARIOS */
-routes.get('/recipient', isPrivate, RecipientController.index);
-routes.post('/recipient', isPrivate, RecipientController.store);
-routes.put('/recipient/:index', isPrivate, RecipientController.update);
+routes.get(
+  '/recipient',
+  isPrivate,
+  validateRecipientIndex,
+  RecipientController.index
+);
+routes.post(
+  '/recipient',
+  isPrivate,
+  validateRecipientStore,
+  RecipientController.store
+);
+routes.put(
+  '/recipient/:index',
+  isPrivate,
+  validateRecipientUpdate,
+  RecipientController.update
+);
 
 /** ROTAS DE ENTREGADORES */
 routes.get('/deliveryman/:id', DeliverymanController.show);
