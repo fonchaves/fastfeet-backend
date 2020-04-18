@@ -369,7 +369,16 @@
       to make a respective query on DB.
 
 124.  Make the same thing to `validators/DeliverymanControllerStore.js` with
-      `DeliverymanControllerController.store`
+      `DeliverymanController.store`
 
 125.  Make the same thing to `validators/DeliverymanControllerUpdate.js` with
-      `DeliverymanControllerController.update`
+      `DeliverymanController.update`
+
+126.  Import `src/lib/AccentRegex.js` in `DeliveryController.index` and configure operators
+      to make a respective query on DB.
+
+127.  Make the same thing to `validators/DeliveryControllerStore.js` with
+      `DeliveryController.store`
+
+128.  Make the same thing to `validators/DeliveryControllerUpdate.js` with
+      `DeliveryController.update`

@@ -1,31 +1,25 @@
-import * as Yup from 'yup';
 import { startOfHour, parseISO, isAfter, isBefore, getHours } from 'date-fns';
 
 import Delivery from '../models/Delivery';
-import File from '../models/File';
+
+import detectAccent from '../../lib/AccentRegex';
 
 const { Op } = require('sequelize');
 
 class DeliveryController {
   async index(req, res) {
-    /** CHECK TYPES OF BODY */
-    const schema = Yup.object().shape({
-      page: Yup.number(),
-    });
-
-    // TODO: RETORNAR ERROS DE VALIDAÇAO MAIS ESPECIFICOS
-    if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation fails' });
-    }
-
     /** DESTRUCTURING */
-    const { page = 1 } = req.body; // TODO: Analisar se passa para Query Params
-    const { q: nameProduct } = req.query;
+    const { q: nameProduct, page = 1 } = req.query;
 
     const deliveryData = await Delivery.findAll({
       where: {
         canceled_at: null,
-        product: { [Op.iLike]: nameProduct ? `%${nameProduct}%` : `%%` },
+        product: {
+          [Op.or]: {
+            [Op.iLike]: nameProduct ? `%${nameProduct}%` : `%%`,
+            [Op.iRegexp]: nameProduct ? `${detectAccent(nameProduct)}` : `%%`,
+          },
+        },
       },
       order: [['created_at', 'DESC']],
       attributes: [
@@ -39,41 +33,22 @@ class DeliveryController {
       ],
       limit: 20,
       offset: (page - 1) * 20,
-      include: [
-        {
-          model: File,
-          as: 'signature',
-          attributes: ['id', 'path', 'url'],
-        },
-      ],
     });
 
     return res.status(200).json(deliveryData);
   }
 
   async store(req, res) {
-    /** CHECK TYPES OF BODY */
-    // TODO: AVALIAR OS CAMPOS NOTREQUIRED SE SERAO NECESSARIOS AQUI
-    const schema = Yup.object().shape({
-      recipient_id: Yup.number().required(),
-      deliveryman_id: Yup.number().required(),
-      product: Yup.string().required(),
-      signature_id: Yup.number().notRequired(),
-      canceled_at: Yup.date().notRequired(),
-      start_date: Yup.date().notRequired(),
-      end_date: Yup.date().notRequired(),
-    });
-
-    // TODO: RETORNAR ERROS DE VALIDAÇAO MAIS ESPECIFICOS
-    if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation fails' });
-    }
-
     /** DESTRUCTURING */
     const { recipient_id, deliveryman_id, product } = req.body;
 
-    /** SAVE DELIVERY IN BD */
-    const deliveryData = await Delivery.create({
+    const {
+      id,
+      signature_id,
+      canceled_at,
+      start_date,
+      end_date,
+    } = await Delivery.create({
       recipient_id,
       deliveryman_id,
       product,
@@ -81,27 +56,21 @@ class DeliveryController {
 
     // TODO: NOTIFICAR O DELIVERYMAN COM EMAIL E DETALHES DA ENCOMENDA
 
-    // TODO: RETORNAR APENAS DADOS NECESSARIOS
-    return res.status(201).json(deliveryData);
+    return res
+      .status(201)
+      .json(
+        id,
+        recipient_id,
+        deliveryman_id,
+        product,
+        signature_id,
+        canceled_at,
+        start_date,
+        end_date
+      );
   }
 
   async update(req, res) {
-    /** CHECK TYPES OF BODY */
-    const schema = Yup.object().shape({
-      recipient_id: Yup.number(),
-      deliveryman_id: Yup.number(),
-      product: Yup.string(),
-      signature_id: Yup.number(),
-      canceled_at: Yup.date(),
-      start_date: Yup.date(),
-      end_date: Yup.date(),
-    });
-
-    // TODO: RETORNAR ERROS DE VALIDAÇAO MAIS ESPECIFICOS
-    if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'Validation fails' });
-    }
-
     /** DESTRUCTURING */
     const {
       recipient_id,
@@ -112,9 +81,9 @@ class DeliveryController {
       end_date,
       canceled_at,
     } = req.body;
-    const { id } = req.params;
+    const { id: index } = req.params;
 
-    const delivery = await Delivery.findByPk(id);
+    const delivery = await Delivery.findByPk(index);
 
     if (start_date) {
       /**
@@ -166,7 +135,7 @@ class DeliveryController {
     /**
      * Update Delivery on BD
      */
-    const deliveryData = await delivery.update({
+    const { id } = await delivery.update({
       recipient_id,
       deliveryman_id,
       product,
@@ -179,7 +148,16 @@ class DeliveryController {
     // TODO: NOTIFICAR O DELIVERYMAN COM EMAIL E DETALHES DA ENCOMENDA
 
     // TODO: RETORNAR APENAS DADOS NECESSARIOS
-    return res.status(200).json(deliveryData);
+    return res.status(200).json({
+      id,
+      product,
+      canceled_at,
+      start_date,
+      end_date,
+      recipient_id,
+      deliveryman_id,
+      signature_id,
+    });
   }
 
   async delete(req, res) {
