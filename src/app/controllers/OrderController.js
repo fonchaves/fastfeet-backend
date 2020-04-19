@@ -1,12 +1,18 @@
 import { isBefore, getHours, startOfDay, endOfDay } from 'date-fns';
-import * as Yup from 'yup';
 import Delivery from '../models/Delivery';
+import Recipient from '../models/Recipient';
+import File from '../models/File';
 
 const { Op } = require('sequelize');
 
 class OrderController {
+  /**
+   * Lista todas as ordens de entrega pendentes para um determinado entregador
+   */
   async index(req, res) {
+    /** DESTRUCTURING */
     const { id } = req.params;
+    const { page = 1 } = req.query;
 
     const deliveries = await Delivery.findAll({
       where: {
@@ -14,13 +20,38 @@ class OrderController {
         canceled_at: null,
         end_date: null,
       },
+      order: [['createdAt', 'DESC']],
+      attributes: ['id', 'product', 'start_date', 'createdAt'],
+      limit: 20,
+      offset: (page - 1) * 20,
+      include: [
+        {
+          model: Recipient,
+          as: 'recipient',
+          attributes: [
+            'id',
+            'name',
+            'street',
+            'number',
+            'complement',
+            'state',
+            'city',
+            'zip_code',
+          ],
+        },
+      ],
     });
 
     return res.status(200).json(deliveries);
   }
 
+  /**
+   * Lista as entregas já realizadas por um determinado entregador
+   */
   async show(req, res) {
+    /** DESTRUCTURING */
     const { id: deliverymanId } = req.params;
+    const { page = 1 } = req.query;
 
     const deliveries = await Delivery.findAll({
       where: {
@@ -28,12 +59,41 @@ class OrderController {
         canceled_at: null,
         end_date: { [Op.not]: null },
       },
+      order: [['created_at', 'DESC']],
+      attributes: ['id', 'product', 'start_date', 'end_date', 'createdAt'],
+      limit: 20,
+      offset: (page - 1) * 20,
+      include: [
+        {
+          model: Recipient,
+          as: 'recipient',
+          attributes: [
+            'id',
+            'name',
+            'street',
+            'number',
+            'complement',
+            'state',
+            'city',
+            'zip_code',
+          ],
+        },
+        {
+          model: File,
+          as: 'signature',
+          attributes: ['id', 'name', 'path', 'url'],
+        },
+      ],
     });
 
     return res.status(200).json(deliveries);
   }
 
+  /**
+   * Inicia uma ordem de entrega (Quando há retirada do produto pelo entregador)
+   */
   async store(req, res) {
+    /** DESTRUCTURING */
     const { id: deliverymanId, id_delivery: deliveryId } = req.params;
 
     const currentDate = new Date();
@@ -55,16 +115,6 @@ class OrderController {
       });
     }
 
-    // TODO: Com o 'id', o deliveryman_id se torna redundante
-    const delivery = await Delivery.findOne({
-      where: {
-        id: deliveryId,
-        deliveryman_id: deliverymanId,
-        canceled_at: null,
-        end_date: null,
-      },
-    });
-
     /** CHECK start_date FOR DATES BEFORE 08:00 */
     if (isBefore(currentDate, new Date().setHours(8, 0, 0, 0))) {
       return res.status(400).json({
@@ -79,30 +129,6 @@ class OrderController {
       });
     }
 
-    const dataDelivery = await delivery.update({
-      start_date: currentDate,
-    });
-
-    // TODO: RETORNAR APENAS DADOS NECESSARIOS
-    return res.status(200).json(dataDelivery);
-  }
-
-  async update(req, res) {
-    const schema = Yup.object().shape({
-      signature_id: Yup.number().required(),
-    });
-
-    if (!(await schema.isValid(req.body))) {
-      return res
-        .status(400)
-        .json({ error: 'Validation fails, signature_id is required' });
-    }
-
-    const { id: deliverymanId, id_delivery: deliveryId } = req.params;
-    const { signature_id: signatureId } = req.body;
-
-    const currentDate = new Date();
-
     const delivery = await Delivery.findOne({
       where: {
         id: deliveryId,
@@ -112,12 +138,40 @@ class OrderController {
       },
     });
 
-    const dataDelivery = await delivery.update({
+    const { id, recipient_id, start_date } = await delivery.update({
+      start_date: currentDate,
+    });
+
+    return res.status(200).json({ id, recipient_id, start_date });
+  }
+
+  /**
+   * Determina a entrega de um produto ao destino final
+   * Necessita de um id de arquivo da assinatura do destinário
+   */
+  async update(req, res) {
+    /** DESTRUCTURING */
+    const { id: deliverymanId, id_delivery: deliveryId } = req.params;
+    const { signature_id: signatureId } = req.body;
+
+    const currentDate = new Date();
+
+    const delivery = await Delivery.findOne({
+      where: {
+        id: deliveryId,
+        deliveryman_id: deliverymanId,
+        start_date: { [Op.not]: null },
+        canceled_at: null,
+        end_date: null,
+      },
+    });
+
+    const { id, signature_id, start_date, end_date } = await delivery.update({
       end_date: currentDate,
       signature_id: signatureId,
     });
 
-    return res.status(200).json(dataDelivery);
+    return res.status(200).json({ id, signature_id, start_date, end_date });
   }
 }
 

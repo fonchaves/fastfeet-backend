@@ -22,6 +22,9 @@ import validateDeliverymanUpdate from './app/validators/DeliverymanUpdate';
 import validateDeliveryIndex from './app/validators/DeliveryIndex';
 import validateDeliveryStore from './app/validators/DeliveryStore';
 import validateDeliveryUpdate from './app/validators/DeliveryUpdate';
+import validateOrderIndex from './app/validators/OrderIndex';
+import validateOrderShow from './app/validators/OrderShow';
+import validateOrderUpdate from './app/validators/OrderUpdate';
 
 /** Middleware of Authorization */
 import isPrivate from './app/middlewares/auth';
@@ -104,10 +107,22 @@ routes.put(
 routes.delete('/delivery/:id', isPrivate, DeliveryController.delete);
 
 /** ROTAS DE ORDENS DE ENTREGA */
-routes.get('/deliveryman/:id/orders', OrderController.index);
-routes.get('/deliveryman/:id/deliveries', OrderController.show);
+routes.get(
+  '/deliveryman/:id/orders',
+  validateOrderIndex,
+  OrderController.index
+);
+routes.get(
+  '/deliveryman/:id/deliveries',
+  validateOrderShow,
+  OrderController.show
+);
 routes.post('/deliveryman/:id/orders/:id_delivery', OrderController.store);
-routes.put('/deliveryman/:id/orders/:id_delivery', OrderController.update);
+routes.put(
+  '/deliveryman/:id/orders/:id_delivery',
+  validateOrderUpdate,
+  OrderController.update
+);
 
 /** ROTAS DE PROBLEMAS DE ENTREGA */
 routes.get('/delivery/problems', isPrivate, DeliveryProblemController.index);

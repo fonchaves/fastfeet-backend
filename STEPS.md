@@ -382,3 +382,11 @@
 
 128.  Make the same thing to `validators/DeliveryControllerUpdate.js` with
       `DeliveryController.update`
+
+129.  Make the same thing to `validators/OrderControllerIndex.js` with
+      `OrderController.store`
+130.  Make the same thing to `validators/OrderControllerShow.js` with
+      `OrderController.store`
+
+131.  Make the same thing to `validators/OrderControllerUpdate.js` with
+      `OrderController.update`
