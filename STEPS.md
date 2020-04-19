@@ -368,25 +368,35 @@
 123.  Import `src/lib/AccentRegex.js` in `DeliverymanController.index` and configure operators
       to make a respective query on DB.
 
-124.  Make the same thing to `validators/DeliverymanControllerStore.js` with
+124.  Make the same thing to `validators/DeliverymanStore.js` with
       `DeliverymanController.store`
 
-125.  Make the same thing to `validators/DeliverymanControllerUpdate.js` with
+125.  Make the same thing to `validators/DeliverymanUpdate.js` with
       `DeliverymanController.update`
 
 126.  Import `src/lib/AccentRegex.js` in `DeliveryController.index` and configure operators
       to make a respective query on DB.
 
-127.  Make the same thing to `validators/DeliveryControllerStore.js` with
+127.  Make the same thing to `validators/DeliveryStore.js` with
       `DeliveryController.store`
 
-128.  Make the same thing to `validators/DeliveryControllerUpdate.js` with
+128.  Make the same thing to `validators/DeliveryUpdate.js` with
       `DeliveryController.update`
 
-129.  Make the same thing to `validators/OrderControllerIndex.js` with
-      `OrderController.store`
-130.  Make the same thing to `validators/OrderControllerShow.js` with
+129.  Make the same thing to `validators/OrderIndex.js` with
+      `OrderController.index`
+
+130.  Make the same thing to `validators/OrderShow.js` with
       `OrderController.store`
 
-131.  Make the same thing to `validators/OrderControllerUpdate.js` with
+131.  Make the same thing to `validators/OrderUpdate.js` with
       `OrderController.update`
+
+132.  Make the same thing to `validators/DeliveryProblemIndex.js` with
+      `DeliveryProblemController.index`
+
+133.  Make the same thing to `validators/DeliveryProblemShow.js` with
+      `DeliveryProblemController.store`
+
+134.  Make the same thing to `validators/DeliveryProblemStore.js` with
+      `DeliveryProblemController.store`

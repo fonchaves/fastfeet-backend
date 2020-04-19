@@ -25,6 +25,9 @@ import validateDeliveryUpdate from './app/validators/DeliveryUpdate';
 import validateOrderIndex from './app/validators/OrderIndex';
 import validateOrderShow from './app/validators/OrderShow';
 import validateOrderUpdate from './app/validators/OrderUpdate';
+import validateDeliveryProblemIndex from './app/validators/DeliveryProblemIndex';
+import validateDeliveryProblemShow from './app/validators/DeliveryProblemShow';
+import validateDeliveryProblemStore from './app/validators/DeliveryProblemStore';
 
 /** Middleware of Authorization */
 import isPrivate from './app/middlewares/auth';
@@ -125,9 +128,22 @@ routes.put(
 );
 
 /** ROTAS DE PROBLEMAS DE ENTREGA */
-routes.get('/delivery/problems', isPrivate, DeliveryProblemController.index);
-routes.get('/delivery/:id/problems', DeliveryProblemController.show);
-routes.post('/delivery/:id/problems', DeliveryProblemController.store);
+routes.get(
+  '/delivery/problems',
+  isPrivate,
+  validateDeliveryProblemIndex,
+  DeliveryProblemController.index
+);
+routes.get(
+  '/delivery/:id/problems',
+  validateDeliveryProblemShow,
+  DeliveryProblemController.show
+);
+routes.post(
+  '/delivery/:id/problems',
+  validateDeliveryProblemStore,
+  DeliveryProblemController.store
+);
 routes.delete(
   '/problem/:id/cancel-delivery',
   isPrivate,

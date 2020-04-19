@@ -1,12 +1,50 @@
-import * as Yup from 'yup';
 import DeliveryProblem from '../models/DeliveryProblem';
+import Delivery from '../models/Delivery';
+import Deliveryman from '../models/Deliveryman';
+import Recipient from '../models/Recipient';
 
 class DeliveryProblemController {
   /**
    * return all deliverys with problems
    */
   async index(req, res) {
-    const dataProblems = await DeliveryProblem.findAll();
+    /** DESTRUCTURING */
+    const { page = 1 } = req.query;
+
+    const dataProblems = await DeliveryProblem.findAll({
+      order: [['created_at', 'ASC']],
+      attributes: ['id', 'description'],
+      limit: 20,
+      offset: (page - 1) * 20,
+      include: [
+        {
+          model: Delivery,
+          as: 'delivery',
+          attributes: ['id', 'product', 'start_date'],
+          include: [
+            {
+              model: Deliveryman,
+              as: 'deliveryman',
+              attributes: ['id', 'name', 'email'],
+            },
+            {
+              model: Recipient,
+              as: 'recipient',
+              attributes: [
+                'id',
+                'name',
+                'street',
+                'number',
+                'complement',
+                'state',
+                'city',
+                'zip_code',
+              ],
+            },
+          ],
+        },
+      ],
+    });
 
     return res.status(200).json(dataProblems);
   }
@@ -17,11 +55,16 @@ class DeliveryProblemController {
   async show(req, res) {
     /** DESTRUCTURING */
     const { id: deliveryId } = req.params;
+    const { page = 1 } = req.query;
 
     const dataProblems = await DeliveryProblem.findAll({
       where: {
         delivery_id: deliveryId,
       },
+      order: [['created_at', 'ASC']],
+      limit: 20,
+      offset: (page - 1) * 20,
+      attributes: ['id', 'description', 'created_at'],
     });
 
     return res.status(200).json(dataProblems);
@@ -31,30 +74,18 @@ class DeliveryProblemController {
    * Register a problem of a delivery
    */
   async store(req, res) {
-    /** CHECK TYPES OF BODY */
-    const schema = Yup.object().shape({
-      description: Yup.string().required(),
-    });
-
-    if (!(await schema.isValid(req.body))) {
-      return res
-        .status(400)
-        .json({ error: 'You need a description of problem.' });
-    }
-
     /** DESTRUCTURING */
     const { id: deliveryId } = req.params;
     const { description } = req.body;
 
-    /** SAVE DELIVERY IN BD */
-    const dataProblem = await DeliveryProblem.create({
+    const { id, delivery_id, createdAt } = await DeliveryProblem.create({
       delivery_id: deliveryId,
       description,
     });
 
-    // TODO: Avaliar se o administrador precisa ser avisado por email
+    // TODO: Administrador precisa ser avisado por email
 
-    return res.status(201).json(dataProblem);
+    return res.status(201).json({ id, delivery_id, description, createdAt });
   }
 
   /**
